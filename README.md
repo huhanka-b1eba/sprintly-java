@@ -135,16 +135,36 @@ docker compose down -v
 
 ## Авторизация и безопасность
 
-Реализован production-подход к аутентификации:
+Аутентификация реализована через stateless JWT access token.
 
-* Access token хранится в памяти
-* Refresh token хранится в httpOnly cookie
-* Реализована ротация refresh токенов
-* Автоматический refresh при 401
-* Защита API через Guards
-* Проверка ролей на backend
-* Защита маршрутов на frontend
-* Изоляция данных по organizationId
+Основной flow:
+
+* Регистрация и вход доступны через `POST /api/auth/register` и `POST /api/auth/login`
+* Перед регистрацией и входом backend проверяет Google reCAPTCHA
+* Пароли хранятся в виде BCrypt-хэшей
+* После успешной регистрации или входа backend возвращает JWT access token
+* JWT содержит `userId` и активный `organizationId`
+* Frontend хранит access token в `localStorage`
+* Все API-запросы отправляют токен в заголовке `Authorization: Bearer <token>`
+* Текущая сессия пользователя загружается через `GET /api/auth/me`
+* При ответе `401` frontend очищает локальный токен и сбрасывает данные текущего пользователя
+
+Spring Security настроен в stateless-режиме:
+
+* CSRF отключен, так как API не использует cookie-based session
+* Публичные endpoints: регистрация, вход, просмотр invite по токену, Swagger и healthcheck
+* Все остальные endpoints требуют валидный Bearer token
+* `JwtAuthenticationFilter` достает пользователя из токена и кладет `CustomUserDetails` в `SecurityContext`
+* Ошибки `401` и `403` возвращаются в JSON-формате через кастомные handlers
+
+Права доступа строятся вокруг активной организации:
+
+* У пользователя есть активная организация (`users.organization_id`)
+* Пользователь может состоять в нескольких организациях через `organization_members`
+* Роли вычисляются динамически: владелец организации получает `OWNER`, участник получает `MEMBER`
+* При переключении организации backend возвращает новый access token для выбранного `organizationId`
+* Сервисы проверяют принадлежность проектов, задач, досок, тегов и папок к текущей организации
+* Для проектов дополнительно проверяется членство пользователя в `project_members`
 
 ---
 
