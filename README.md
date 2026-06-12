@@ -18,9 +18,6 @@ Sprintly — веб-приложение для управления проек�
 * Shadcn UI (компоненты)
 * Feature-Sliced Design (FSD)
 * dnd-kit (drag & drop)
-* SSR защищённых страниц
-* Optimistic updates
-* Error boundaries
 
 Ключевые принципы:
 
@@ -28,7 +25,6 @@ Sprintly — веб-приложение для управления проек�
 * Изоляция бизнес-логики на уровне features
 * Минимизация проп-дриллинга
 * Управление доступом на уровне UI через role-based rendering
-* Централизованная обработка 401 и auto-refresh токена
 
 ---
 
@@ -51,6 +47,54 @@ Sprintly — веб-приложение для управления проек�
 * Проверка прав доступа через Spring Security
 * Валидация входных данных на уровне DTO
 * Явная доменная модель и работа через JPA
+
+---
+
+## Запуск через Docker Compose
+
+Docker Compose конфигурация находится в директории `java-backend` и поднимает backend, PostgreSQL и Redis.
+
+1. Перейдите в директорию backend:
+
+```bash
+cd java-backend
+```
+
+2. Создайте `.env` на основе примера и заполните значения секретов:
+
+```bash
+cp .env.example .env
+```
+
+3. Соберите и запустите контейнеры:
+
+```bash
+docker compose up --build
+```
+
+После запуска backend будет доступен на `http://localhost:8080`.
+
+Полезные команды:
+
+```bash
+# Запуск в фоне
+docker compose up --build -d
+
+# Просмотр логов backend
+docker compose logs -f app
+
+# Остановка контейнеров
+docker compose down
+
+# Остановка с удалением volume PostgreSQL и Redis
+docker compose down -v
+```
+
+По умолчанию сервисы доступны на следующих портах:
+
+* Backend: `8080`
+* PostgreSQL: `5432`
+* Redis: `6379`
 
 ---
 
@@ -125,4 +169,3 @@ Sprintly — веб-приложение для управления проек�
 * Multi-tenant модель через organizationId вместо отдельных БД
 * Разделение server/client state через TanStack Query + RTK
 * Soft delete вместо физического удаления для сохранения истории
-
