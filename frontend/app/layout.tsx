@@ -3,7 +3,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 import { AppProviders } from '@/app/providers';
 import { siteConfig } from '@/shared/config';
-import { THEME_STORAGE_KEY } from '@/shared/lib';
+import { THEME_STORAGE_KEY } from '@/shared/lib/theme-storage';
 import './globals.css';
 
 export const metadata: Metadata = {

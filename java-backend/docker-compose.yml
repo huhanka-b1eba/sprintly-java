@@ -28,6 +28,8 @@ services:
       SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 5MB
       SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 5MB
 
+      APP_STORAGE_S3_ENDPOINT: https://s3.ru-3.storage.selcloud.ru
+
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: info
       LOGGING_LEVEL_ORG_HIBERNATE_SQL: info
     ports:
@@ -42,7 +44,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:

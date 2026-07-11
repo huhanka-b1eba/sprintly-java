@@ -11,7 +11,7 @@ import {
     type PropsWithChildren,
 } from 'react';
 
-const THEME_STORAGE_KEY = 'sprintly-theme';
+import { THEME_STORAGE_KEY } from './theme-storage';
 
 type Theme = 'light' | 'dark';
 
@@ -37,8 +37,8 @@ const subscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-export function ThemeProvider({ children }: PropsWithChildren) {
-    const [theme, setThemeState] = useState<Theme>(() => {
+export function ThemeProvider({ children }: Readonly<PropsWithChildren>) {
+    const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window === 'undefined') {
             return 'light';
         }
@@ -59,23 +59,23 @@ export function ThemeProvider({ children }: PropsWithChildren) {
         applyTheme(theme);
     }, [theme]);
 
-    const setTheme = useCallback((nextTheme: Theme) => {
-        setThemeState(nextTheme);
+    const updateTheme = useCallback((nextTheme: Theme) => {
+        setTheme(nextTheme);
         window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     }, []);
 
     const toggleTheme = useCallback(() => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-    }, [setTheme, theme]);
+        updateTheme(theme === 'dark' ? 'light' : 'dark');
+    }, [theme, updateTheme]);
 
     const value = useMemo(
         () => ({
             mounted,
             theme,
-            setTheme,
+            setTheme: updateTheme,
             toggleTheme,
         }),
-        [mounted, setTheme, theme, toggleTheme],
+        [mounted, theme, toggleTheme, updateTheme],
     );
 
     return (
